@@ -1,5 +1,5 @@
 import React from 'react';
-import { useBooking } from '../context/BookingContext';
+import { useBooking } from '../context/BookingContext.jsx';
 
 function DeskItem({ desk }) {
   const { selectDesk, selectedDesk } = useBooking();
@@ -19,7 +19,6 @@ function DeskItem({ desk }) {
     >
       <div className="desk-info">
         <h3>{desk.name}</h3>
-        <span className="desk-type">{desk.type}</span>
         <span className="desk-status">
           {desk.isAvailable ? 'Available' : 'Booked'}
         </span>
