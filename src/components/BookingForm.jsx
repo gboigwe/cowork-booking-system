@@ -12,6 +12,7 @@ function BookingForm() {
   
   const [totalCost, setTotalCost] = useState(0);
   
+  // Recalculate total cost when form data or selected desk changes
   useEffect(() => {
     if (selectedDesk) {
       const total = calculateTotal(
@@ -41,7 +42,7 @@ function BookingForm() {
     return (
       <div className="booking-form-container">
         <div className="empty-form-message">
-          <p>Please select a desk to book</p>
+          <p>Please select an available desk to book</p>
         </div>
       </div>
     );

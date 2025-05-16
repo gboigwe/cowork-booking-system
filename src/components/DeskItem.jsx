@@ -1,5 +1,5 @@
 import React from 'react';
-import { useBooking } from '../context/BookingContext.jsx';
+import { useBooking } from '../context/BookingContext';
 
 function DeskItem({ desk }) {
   const { selectDesk, selectedDesk } = useBooking();

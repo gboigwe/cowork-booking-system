@@ -5,6 +5,8 @@ import Footer from './components/Footer';
 import DeskList from './components/DeskList';
 import BookingForm from './components/BookingForm';
 import BookingSummary from './components/BookingSummary';
+import UsageChart from './components/UsageChart';
+import ExportBookings from './components/ExportBookings';
 import { BookingProvider } from './context/BookingContext';
 
 function App() {
@@ -21,6 +23,8 @@ function App() {
             </div>
             
             <BookingSummary />
+            <UsageChart />
+            <ExportBookings />
           </div>
         </main>
         
