@@ -7,11 +7,18 @@ import { seedDesks } from './db/seed.js';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || '*',
+}));
 app.use(express.json());
 
 // Seed initial data
 seedDesks();
+
+// Health check
+app.get('/api/health', (_req, res) => {
+  res.json({ status: 'ok' });
+});
 
 // Routes
 app.get('/api/analytics', (req, res, next) => {
