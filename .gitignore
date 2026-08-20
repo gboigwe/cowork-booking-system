@@ -27,3 +27,11 @@ dist-ssr
 *.db
 *.db-shm
 *.db-wal
+
+# Internal tooling and reference material, not part of the shipped project
+# and not for the public repo (this is a closed-source, private business project).
+.claude/
+docs/
+ZONEIN Project scope/
+Project scope clarification needed.zip
+ZoneIn Hub - Brand Guidelines.pdf
