@@ -1,11 +1,11 @@
-export type DeskType = 'individual' | 'team';
-export type MembershipTier = 'basic' | 'premium' | 'executive';
+export type DeskSide = 'left' | 'right';
+export type PayMethod = 'online' | 'venue';
 
 export interface Desk {
   id: string;
-  name: string;
-  type: DeskType;
-  position_index: number;
+  side: DeskSide;
+  desc: string;
+  position: number;
 }
 
 export interface DeskAvailability extends Desk {
@@ -16,21 +16,18 @@ export interface Booking {
   id: string;
   deskId: string;
   deskName: string;
-  deskType: DeskType;
-  membershipTier: MembershipTier | null;
+  deskDesc: string;
   date: string;
-  startTime: string;
-  endTime: string;
-  hours: number;
-  totalCost: number;
+  holderName: string;
+  holderPhone: string;
+  payMethod: PayMethod;
+  amount: number;
   createdAt: string;
 }
 
-export interface AnalyticsData {
+export interface AdminOverview {
+  desks: DeskAvailability[];
+  todaysBookings: Booking[];
   totalBookings: number;
   totalRevenue: number;
-  averageHours: number;
-  popularDesk: string;
-  tierBreakdown: Record<string, number>;
-  dailyBookings: { date: string; count: number }[];
 }

@@ -1,4 +1,4 @@
-import type { Desk, Booking, AnalyticsData, DeskAvailability } from '../types';
+import type { Booking, DeskAvailability, PayMethod, AdminOverview } from '../types';
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
@@ -18,20 +18,15 @@ export const api = {
   getDesks: (date?: string) =>
     request<DeskAvailability[]>(`/desks${date ? `?date=${date}` : ''}`),
 
-  getDeskAvailability: (date: string, startTime: string, endTime: string) =>
-    request<DeskAvailability[]>(
-      `/desks/availability?date=${date}&startTime=${startTime}&endTime=${endTime}`
-    ),
-
-  getBookings: () =>
-    request<Booking[]>('/bookings'),
+  getBookings: (phone?: string) =>
+    request<Booking[]>(`/bookings${phone ? `?phone=${encodeURIComponent(phone)}` : ''}`),
 
   createBooking: (data: {
     deskId: string;
     date: string;
-    startTime: string;
-    endTime: string;
-    membershipTier: string;
+    holderName: string;
+    holderPhone: string;
+    payMethod: PayMethod;
   }) =>
     request<Booking>('/bookings', {
       method: 'POST',
@@ -41,6 +36,32 @@ export const api = {
   cancelBooking: (id: string) =>
     request<{ success: boolean }>(`/bookings/${id}`, { method: 'DELETE' }),
 
-  getAnalytics: () =>
-    request<AnalyticsData>('/analytics'),
+  sendOtp: (phone: string) =>
+    request<{ sent: boolean }>('/otp/send', {
+      method: 'POST',
+      body: JSON.stringify({ phone }),
+    }),
+
+  verifyOtp: (phone: string, code: string) =>
+    request<{ verified: boolean }>('/otp/verify', {
+      method: 'POST',
+      body: JSON.stringify({ phone, code }),
+    }),
+
+  adminLogin: (password: string) =>
+    request<{ token: string }>('/admin/login', {
+      method: 'POST',
+      body: JSON.stringify({ password }),
+    }),
+
+  adminOverview: (token: string) =>
+    request<AdminOverview>('/admin/overview', {
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    }),
+
+  adminToggleBlock: (deskId: string, token: string) =>
+    request<{ success: boolean }>(`/admin/desks/${deskId}/block`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    }),
 };

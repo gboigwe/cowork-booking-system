@@ -1,71 +1,50 @@
 import { Link } from 'react-router-dom';
+import Logo from './Logo';
+import { CONTACT } from '../utils/contact';
 
 function Footer() {
   return (
-    <footer className="relative bg-gradient-to-b from-blue-950 to-slate-950 text-blue-100/60 overflow-hidden">
-      {/* Subtle glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="md:col-span-1">
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
-                </svg>
-              </div>
-              <span className="text-xl font-bold text-white">TECH-AGE <span className="text-blue-400">Hub</span></span>
-            </div>
-            <p className="text-sm leading-relaxed">
-              Modern co-working spaces designed for productivity and collaboration.
+    <footer className="border-t border-zonein-border pt-12 sm:pt-16 pb-8 px-5 sm:px-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+          <div>
+            <Logo tagline />
+            <p className="text-sm leading-relaxed text-zonein-gray mt-4 max-w-[220px]">
+              A quiet place to get work done, in {CONTACT.addressShort}.
             </p>
           </div>
 
-          <div>
-            <h4 className="text-white font-semibold mb-3">Quick Links</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link to="/" className="hover:text-white transition-colors duration-300">Home</Link></li>
-              <li><Link to="/booking" className="hover:text-white transition-colors duration-300">Book a Space</Link></li>
-              <li><Link to="/my-bookings" className="hover:text-white transition-colors duration-300">My Bookings</Link></li>
-              <li><Link to="/dashboard" className="hover:text-white transition-colors duration-300">Dashboard</Link></li>
-            </ul>
+          <div className="flex flex-col gap-2.5">
+            <span className="text-[13px] font-semibold text-zonein-gray uppercase tracking-[0.04em] mb-1">Explore</span>
+            <Link to="/space" className="text-sm text-zonein-ink hover:text-zonein-green-dark">The Space</Link>
+            <Link to="/pricing" className="text-sm text-zonein-ink hover:text-zonein-green-dark">Pricing</Link>
+            <Link to="/booking" className="text-sm text-zonein-ink hover:text-zonein-green-dark">Book a seat</Link>
+            <Link to="/my-bookings" className="text-sm text-zonein-ink hover:text-zonein-green-dark">My bookings</Link>
+            <Link to="/faq" className="text-sm text-zonein-ink hover:text-zonein-green-dark">FAQ</Link>
           </div>
 
-          <div>
-            <h4 className="text-white font-semibold mb-3">Membership</h4>
-            <ul className="space-y-2 text-sm">
-              <li>Basic - $10/hr</li>
-              <li>Premium - $15/hr</li>
-              <li>Executive - $20/hr</li>
-              <li>Team Desk - $25/hr</li>
-            </ul>
+          <div className="flex flex-col gap-2.5">
+            <span className="text-[13px] font-semibold text-zonein-gray uppercase tracking-[0.04em] mb-1">About</span>
+            <Link to="/about" className="text-sm text-zonein-ink hover:text-zonein-green-dark">Our story</Link>
+            <Link to="/future" className="text-sm text-zonein-ink hover:text-zonein-green-dark">Private offices &amp; meeting room</Link>
+            <Link to="/location" className="text-sm text-zonein-ink hover:text-zonein-green-dark">Location &amp; contact</Link>
           </div>
 
-          <div>
-            <h4 className="text-white font-semibold mb-3">Contact</h4>
-            <ul className="space-y-2 text-sm">
-              <li>123 Innovation Drive</li>
-              <li>San Francisco, CA 94107</li>
-              <li>hello@techage.hub</li>
-              <li>(555) 123-4567</li>
-            </ul>
+          <div className="flex flex-col gap-2.5">
+            <span className="text-[13px] font-semibold text-zonein-gray uppercase tracking-[0.04em] mb-1">Reach us</span>
+            <a href={`tel:${CONTACT.phoneTel}`} className="text-sm text-zonein-ink hover:text-zonein-green-dark">{CONTACT.phoneDisplay}</a>
+            <a href={CONTACT.whatsappUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-zonein-ink hover:text-zonein-green-dark">WhatsApp</a>
+            <a href={`mailto:${CONTACT.email}`} className="text-sm text-zonein-ink hover:text-zonein-green-dark">{CONTACT.email}</a>
           </div>
         </div>
 
-        <div className="border-t border-white/10 mt-10 pt-6 text-center text-sm space-y-1">
-          <p>&copy; {new Date().getFullYear()} TECH-AGE Hub. All rights reserved.</p>
-          <p>
-            Built by{' '}
-            <a
-              href="https://agedevs.netlify.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-400 hover:text-blue-300 transition-colors font-medium"
-            >
-              Gbolahan Akande
-            </a>
-          </p>
+        <div className="border-t border-zonein-border pt-6 flex flex-wrap justify-between items-center gap-3">
+          <span className="text-[13px] text-zonein-gray">© {new Date().getFullYear()} ZoneIn Hub</span>
+          <div className="flex gap-5 items-center">
+            <Link to="/privacy" className="text-[13px] text-zonein-gray hover:text-zonein-green-dark">Privacy</Link>
+            <Link to="/terms" className="text-[13px] text-zonein-gray hover:text-zonein-green-dark">Terms</Link>
+            <Link to="/admin" className="text-[13px] text-zonein-gray hover:text-zonein-green-dark">Staff</Link>
+          </div>
         </div>
       </div>
     </footer>

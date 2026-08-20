@@ -4,55 +4,26 @@ import type { DeskAvailability } from '../types/index.js';
 
 const router = Router();
 
+function todayString(): string {
+  return new Date().toISOString().split('T')[0];
+}
+
 // GET /api/desks?date=YYYY-MM-DD
 router.get('/', (req: Request, res: Response) => {
-  const date = (req.query.date as string) || new Date().toISOString().split('T')[0];
+  const date = (req.query.date as string) || todayString();
 
-  const desks = db.prepare('SELECT * FROM desks ORDER BY position_index').all() as any[];
+  const desks = db.prepare('SELECT * FROM desks ORDER BY side DESC, position').all() as any[];
 
-  // Get all bookings for this date
-  const bookings = db.prepare(
-    'SELECT desk_id FROM bookings WHERE date = ?'
-  ).all(date) as { desk_id: string }[];
-
-  const bookedDeskIds = new Set(bookings.map(b => b.desk_id));
+  const booked = db.prepare('SELECT desk_id FROM bookings WHERE date = ?').all(date) as { desk_id: string }[];
+  const blocked = db.prepare('SELECT desk_id FROM desk_blocks WHERE date = ?').all(date) as { desk_id: string }[];
+  const unavailableIds = new Set([...booked.map(b => b.desk_id), ...blocked.map(b => b.desk_id)]);
 
   const result: DeskAvailability[] = desks.map(d => ({
     id: d.id,
-    name: d.name,
-    type: d.type,
-    position_index: d.position_index,
-    isAvailable: !bookedDeskIds.has(d.id),
-  }));
-
-  res.json(result);
-});
-
-// GET /api/desks/availability?date=&startTime=&endTime=
-router.get('/availability', (req: Request, res: Response) => {
-  const { date, startTime, endTime } = req.query as Record<string, string>;
-
-  if (!date || !startTime || !endTime) {
-    res.status(400).json({ error: 'date, startTime, and endTime are required' });
-    return;
-  }
-
-  const desks = db.prepare('SELECT * FROM desks ORDER BY position_index').all() as any[];
-
-  // Find overlapping bookings for the given date + time range
-  const overlapping = db.prepare(`
-    SELECT desk_id FROM bookings
-    WHERE date = ? AND start_time < ? AND end_time > ?
-  `).all(date, endTime, startTime) as { desk_id: string }[];
-
-  const bookedDeskIds = new Set(overlapping.map(b => b.desk_id));
-
-  const result: DeskAvailability[] = desks.map(d => ({
-    id: d.id,
-    name: d.name,
-    type: d.type,
-    position_index: d.position_index,
-    isAvailable: !bookedDeskIds.has(d.id),
+    side: d.side,
+    desc: d.desc,
+    position: d.position,
+    isAvailable: !unavailableIds.has(d.id),
   }));
 
   res.json(result);

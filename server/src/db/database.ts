@@ -15,22 +15,28 @@ db.pragma('foreign_keys = ON');
 db.exec(`
   CREATE TABLE IF NOT EXISTS desks (
     id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    type TEXT NOT NULL CHECK(type IN ('individual', 'team')),
-    position_index INTEGER NOT NULL UNIQUE
+    side TEXT NOT NULL CHECK(side IN ('left', 'right')),
+    desc TEXT NOT NULL,
+    position INTEGER NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS desk_blocks (
+    desk_id TEXT NOT NULL,
+    date TEXT NOT NULL,
+    PRIMARY KEY (desk_id, date),
+    FOREIGN KEY (desk_id) REFERENCES desks(id)
   );
 
   CREATE TABLE IF NOT EXISTS bookings (
     id TEXT PRIMARY KEY,
     desk_id TEXT NOT NULL,
     desk_name TEXT NOT NULL,
-    desk_type TEXT NOT NULL,
-    membership_tier TEXT,
+    desk_desc TEXT NOT NULL,
     date TEXT NOT NULL,
-    start_time TEXT NOT NULL,
-    end_time TEXT NOT NULL,
-    hours REAL NOT NULL,
-    total_cost REAL NOT NULL,
+    holder_name TEXT NOT NULL,
+    holder_phone TEXT NOT NULL,
+    pay_method TEXT NOT NULL CHECK(pay_method IN ('online', 'venue')),
+    amount REAL NOT NULL,
     created_at TEXT NOT NULL,
     FOREIGN KEY (desk_id) REFERENCES desks(id)
   );

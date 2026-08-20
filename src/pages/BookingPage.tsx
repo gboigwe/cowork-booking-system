@@ -1,185 +1,229 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import DeskMapSVG from '../components/booking/DeskMapSVG';
-import BookingForm from '../components/BookingForm';
-import { useBooking } from '../context/BookingContext';
+import DeskLayout from '../components/zonein/DeskLayout';
+import { FloatingShapes } from '../components/zonein/FloatingShapes';
+import { useBooking, DAY_RATE_NGN } from '../context/BookingContext';
+import { api } from '../utils/api';
+import { formatNaira, getTodayString } from '../utils/helpers';
+import { generateTicketPDF } from '../utils/ticket';
+import type { Booking, PayMethod } from '../types';
 
-const steps = [
-  { num: 1, label: 'Select Desk', icon: (
-    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zM12 2.25V4.5m5.834.166l-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243l-1.59-1.59" />
-    </svg>
-  )},
-  { num: 2, label: 'Choose Time', icon: (
-    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-  )},
-  { num: 3, label: 'Confirm', icon: (
-    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-  )},
-];
+type Step = 'select' | 'identity' | 'payment' | 'confirm';
+
+const inputClass = 'w-full px-4 py-3.5 border border-zonein-border rounded-lg text-[15px] font-sans outline-none focus:border-zonein-green transition-colors';
 
 function BookingPage() {
-  const { selectedDesk } = useBooking();
-  const [bookingSuccess, setBookingSuccess] = useState(false);
-  const currentStep = bookingSuccess ? 3 : selectedDesk ? 2 : 1;
+  const { desks, selectedDesk, selectDesk, clearSelectedDesk, createBooking } = useBooking();
+
+  const [step, setStep] = useState<Step>('select');
+  const [date, setDate] = useState(getTodayString());
+  const [holderName, setHolderName] = useState('');
+  const [holderPhone, setHolderPhone] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [otpBusy, setOtpBusy] = useState(false);
+  const [payMethod, setPayMethod] = useState<PayMethod | null>(null);
+  const [lastBooking, setLastBooking] = useState<Booking | null>(null);
+  const [downloadingTicket, setDownloadingTicket] = useState(false);
+
+  const canProceedToIdentity = !!(selectedDesk && date);
+
+  const handleSendOtp = async () => {
+    if (!holderName.trim() || !holderPhone.trim()) return;
+    setOtpBusy(true);
+    await api.sendOtp(holderPhone.trim());
+    setOtpBusy(false);
+    setOtpSent(true);
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!otpCode.trim()) return;
+    setOtpBusy(true);
+    const result = await api.verifyOtp(holderPhone.trim(), otpCode.trim());
+    setOtpBusy(false);
+    if (result.verified) setStep('payment');
+  };
+
+  const handleConfirmBooking = async () => {
+    if (!payMethod) return;
+    const booking = await createBooking({
+      date, holderName: holderName.trim(), holderPhone: holderPhone.trim(), payMethod,
+    });
+    if (booking) {
+      setLastBooking(booking);
+      setStep('confirm');
+    }
+  };
+
+  const handleDownloadTicket = async () => {
+    if (!lastBooking) return;
+    setDownloadingTicket(true);
+    await generateTicketPDF(lastBooking);
+    setDownloadingTicket(false);
+  };
+
+  const resetFlow = () => {
+    clearSelectedDesk();
+    setStep('select');
+    setDate(getTodayString());
+    setHolderName('');
+    setHolderPhone('');
+    setOtpSent(false);
+    setOtpCode('');
+    setPayMethod(null);
+    setLastBooking(null);
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 pt-16 relative overflow-hidden">
-      {/* Background elements */}
-      <div className="absolute top-20 right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-20 left-10 w-80 h-80 bg-blue-400/5 rounded-full blur-3xl pointer-events-none" />
+    <div className="relative overflow-hidden max-w-7xl mx-auto px-5 sm:px-8 py-10 sm:py-16">
+      <FloatingShapes variant="cream" />
+      <h1 className="relative font-display font-bold text-3xl sm:text-4xl text-zonein-ink mb-2">Book a seat</h1>
+      <p className="relative text-[15px] text-zonein-gray mb-10">Pick a desk, choose a date, and you're set.</p>
 
-      {/* Page header */}
-      <div className="relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-6">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-blue-200 text-sm font-medium mb-3">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-              </svg>
-              Booking
-            </span>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white">Book Your Space</h1>
-            <p className="text-blue-100/60 mt-2 text-lg">Select a desk, choose your time, and you're in.</p>
-          </motion.div>
-
-          {/* Step Indicator */}
-          <motion.div
-            className="mt-8 flex items-center gap-0 max-w-lg"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.15 }}
+      <AnimatePresence mode="wait">
+        {step === 'select' && (
+          <motion.div key="select" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="relative grid lg:grid-cols-[1.3fr_1fr] gap-10 items-start"
           >
-            {steps.map((step, i) => (
-              <div key={step.num} className="flex items-center flex-1">
-                <div className="flex items-center gap-2.5">
-                  <motion.div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500 ${
-                      currentStep >= step.num
-                        ? 'bg-blue-500/30 backdrop-blur-xl border border-blue-400/30 text-blue-300 shadow-lg shadow-blue-500/20'
-                        : 'bg-white/5 border border-white/10 text-white/30'
-                    }`}
-                    animate={currentStep >= step.num ? { scale: [1, 1.1, 1] } : {}}
-                    transition={{ duration: 0.3 }}
+            <DeskLayout
+              desks={desks}
+              interactive
+              selectedId={selectedDesk?.id ?? null}
+              onSelectDesk={selectDesk}
+            />
+
+            <div className="border border-zonein-border rounded-2xl p-7 lg:sticky lg:top-28">
+              {selectedDesk ? (
+                <>
+                  <p className="font-display font-bold text-xl text-zonein-ink mb-1">{selectedDesk.id}</p>
+                  <p className="text-sm text-zonein-gray mb-6 capitalize">{selectedDesk.desc}</p>
+                  <label className="block text-[13px] font-semibold text-zonein-gray mb-2">Date</label>
+                  <input
+                    type="date" value={date} min={getTodayString()}
+                    onChange={(e) => setDate(e.target.value)}
+                    className={`${inputClass} mb-5`}
+                  />
+                  <div className="flex justify-between py-3.5 border-t border-zonein-border mb-5">
+                    <span className="text-sm text-zonein-gray">Rate</span>
+                    <span className="text-sm font-semibold text-zonein-ink">{formatNaira(DAY_RATE_NGN)} / day</span>
+                  </div>
+                  <button
+                    disabled={!canProceedToIdentity}
+                    onClick={() => setStep('identity')}
+                    className="w-full bg-zonein-green hover:bg-zonein-green-dark disabled:bg-zonein-green-light disabled:cursor-not-allowed text-zonein-cream font-display font-semibold rounded-lg py-3.5 transition-colors"
                   >
-                    {step.icon}
-                  </motion.div>
-                  <span className={`text-sm font-semibold hidden sm:block transition-colors duration-300 ${
-                    currentStep >= step.num ? 'text-white' : 'text-white/30'
-                  }`}>
-                    {step.label}
-                  </span>
-                </div>
-                {i < steps.length - 1 && (
-                  <div className="flex-1 mx-3 h-0.5 rounded-full bg-white/10 overflow-hidden">
-                    <motion.div
-                      className="h-full bg-blue-500/50 rounded-full"
-                      initial={{ width: '0%' }}
-                      animate={{ width: currentStep > step.num ? '100%' : '0%' }}
-                      transition={{ duration: 0.5, ease: 'easeInOut' }}
-                    />
-                  </div>
-                )}
-              </div>
-            ))}
+                    Confirm booking
+                  </button>
+                </>
+              ) : (
+                <p className="text-sm text-zonein-gray text-center py-10">Select a desk to continue</p>
+              )}
+            </div>
           </motion.div>
-        </div>
-      </div>
+        )}
 
-      {/* Main content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 relative z-10">
-        <AnimatePresence mode="wait">
-          {bookingSuccess ? (
-            <motion.div
-              key="success"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="flex flex-col items-center justify-center py-20"
-            >
-              <motion.div
-                className="w-24 h-24 bg-green-500/20 backdrop-blur-xl border border-green-400/30 rounded-full flex items-center justify-center mb-6"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.2 }}
+        {step === 'identity' && (
+          <motion.div key="identity" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="relative max-w-md">
+            <button onClick={() => setStep('select')} className="text-sm text-zonein-green-dark mb-5">← Back</button>
+            <h2 className="font-display font-semibold text-xl text-zonein-ink mb-2">Who's booking?</h2>
+            <p className="text-sm text-zonein-gray mb-7">No account needed. We'll verify with a one-time code.</p>
+
+            <label className="block text-[13px] font-semibold text-zonein-gray mb-2">Name</label>
+            <input type="text" value={holderName} onChange={(e) => setHolderName(e.target.value)}
+              placeholder="Your name" className={`${inputClass} mb-5`} />
+
+            <label className="block text-[13px] font-semibold text-zonein-gray mb-2">Phone number</label>
+            <input type="tel" value={holderPhone} onChange={(e) => setHolderPhone(e.target.value)}
+              placeholder="080..." className={`${inputClass} mb-6`} />
+
+            {!otpSent ? (
+              <button
+                disabled={!holderName.trim() || !holderPhone.trim() || otpBusy}
+                onClick={handleSendOtp}
+                className="w-full bg-zonein-green hover:bg-zonein-green-dark disabled:bg-zonein-green-light text-zonein-cream font-display font-semibold rounded-lg py-3.5 transition-colors"
               >
-                <svg className="w-12 h-12 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-              </motion.div>
-              <h2 className="text-2xl font-bold text-white mb-2">Booking Confirmed!</h2>
-              <p className="text-blue-100/60 mb-8">Your desk has been reserved successfully.</p>
-              <div className="flex gap-4">
-                <button onClick={() => setBookingSuccess(false)}
-                  className="px-6 py-3 bg-blue-500 text-white rounded-full font-semibold hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/30 hover:scale-105"
+                {otpBusy ? 'Sending…' : 'Send code'}
+              </button>
+            ) : (
+              <>
+                <p className="text-[13px] text-zonein-gray mb-4">Code sent. Enter any 4 digits to continue.</p>
+                <input type="text" value={otpCode} onChange={(e) => setOtpCode(e.target.value)}
+                  placeholder="0000" maxLength={4}
+                  className={`${inputClass} mb-5 text-center tracking-[0.3em]`} />
+                <button
+                  disabled={!otpCode.trim() || otpBusy}
+                  onClick={handleVerifyOtp}
+                  className="w-full bg-zonein-green hover:bg-zonein-green-dark disabled:bg-zonein-green-light text-zonein-cream font-display font-semibold rounded-lg py-3.5 transition-colors"
                 >
-                  Book Another
+                  {otpBusy ? 'Verifying…' : 'Verify & continue'}
                 </button>
-                <a href="/my-bookings"
-                  className="px-6 py-3 bg-white/10 backdrop-blur-xl border border-white/20 text-white rounded-full font-semibold hover:bg-white/20 transition-all"
-                >
-                  View Bookings
-                </a>
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="booking"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-2"
-            >
-              {/* Floor Plan */}
-              <motion.div className="lg:col-span-2"
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-              >
-                <div className="backdrop-blur-xl bg-white/5 rounded-2xl border border-white/15 shadow-2xl shadow-blue-500/5 overflow-hidden">
-                  <div className="px-6 py-4 border-b border-white/10">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                          <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
-                          </svg>
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-bold text-white">Floor Plan</h3>
-                          <p className="text-xs text-blue-200/50">Click an available desk to select it</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3 text-xs text-blue-200/50">
-                        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-green-400" /> Available</span>
-                        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-gray-500" /> Booked</span>
-                        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-blue-500" /> Selected</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-4">
-                    <DeskMapSVG />
-                  </div>
-                </div>
-              </motion.div>
+              </>
+            )}
+          </motion.div>
+        )}
 
-              {/* Booking Form */}
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.35 }}
+        {step === 'payment' && (
+          <motion.div key="payment" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="relative max-w-md">
+            <button onClick={() => setStep('identity')} className="text-sm text-zonein-green-dark mb-5">← Back</button>
+            <h2 className="font-display font-semibold text-xl text-zonein-ink mb-6">How would you like to pay?</h2>
+
+            <div className="flex flex-col gap-3 mb-6">
+              <button
+                onClick={() => setPayMethod('online')}
+                className={`text-left border-[1.5px] rounded-[10px] p-[18px] transition-colors ${payMethod === 'online' ? 'border-zonein-green' : 'border-zonein-border'}`}
               >
-                <BookingForm onSuccess={() => setBookingSuccess(true)} />
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+                <p className="font-display font-semibold text-[15px] text-zonein-ink mb-1">Pay online</p>
+                <p className="text-[13px] text-zonein-gray">Card or bank transfer, {formatNaira(DAY_RATE_NGN)}</p>
+              </button>
+              <button
+                onClick={() => setPayMethod('venue')}
+                className={`text-left border-[1.5px] rounded-[10px] p-[18px] transition-colors ${payMethod === 'venue' ? 'border-zonein-green' : 'border-zonein-border'}`}
+              >
+                <p className="font-display font-semibold text-[15px] text-zonein-ink mb-1">Pay at the venue</p>
+                <p className="text-[13px] text-zonein-gray">Settle up when you arrive</p>
+              </button>
+            </div>
+
+            <button
+              disabled={!payMethod}
+              onClick={handleConfirmBooking}
+              className="w-full bg-zonein-green hover:bg-zonein-green-dark disabled:bg-zonein-green-light text-zonein-cream font-display font-semibold rounded-lg py-3.5 transition-colors"
+            >
+              Confirm booking
+            </button>
+          </motion.div>
+        )}
+
+        {step === 'confirm' && lastBooking && (
+          <motion.div key="confirm" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }}
+            className="relative max-w-md border border-zonein-border rounded-2xl p-9 bg-zonein-cream"
+          >
+            <p className="text-[13px] font-semibold uppercase tracking-[0.06em] text-zonein-green-dark mb-4">Booking confirmed</p>
+            <p className="text-sm text-zonein-gray mb-1">Desk</p>
+            <p className="font-display font-bold text-xl text-zonein-ink mb-4">{lastBooking.deskName} · {lastBooking.deskDesc}</p>
+            <p className="text-sm text-zonein-gray mb-1">Date</p>
+            <p className="font-display font-semibold text-base text-zonein-ink mb-4">{lastBooking.date}</p>
+            <p className="text-sm text-zonein-gray mb-1">Payment</p>
+            <p className="font-display font-semibold text-base text-zonein-ink mb-6">
+              {lastBooking.payMethod === 'online' ? 'Paid online' : 'Pay at the venue'}
+            </p>
+
+            <button
+              onClick={handleDownloadTicket}
+              disabled={downloadingTicket}
+              className="w-full border border-zonein-green text-zonein-green-dark font-display font-semibold rounded-lg py-3.5 mb-3 hover:bg-zonein-green/5 transition-colors"
+            >
+              {downloadingTicket ? 'Generating…' : 'Download ticket'}
+            </button>
+            <button
+              onClick={resetFlow}
+              className="w-full bg-zonein-green hover:bg-zonein-green-dark text-zonein-cream font-display font-semibold rounded-lg py-3.5 transition-colors"
+            >
+              Done
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -1,49 +1,33 @@
-export type DeskType = 'individual' | 'team';
-export type MembershipTier = 'basic' | 'premium' | 'executive';
+export type DeskSide = 'left' | 'right';
+export type PayMethod = 'online' | 'venue';
 
 export interface Desk {
   id: string;
-  name: string;
-  type: DeskType;
-  position_index: number;
-  isAvailable?: boolean;
-}
-
-export interface Booking {
-  id: string;
-  deskId: string;
-  deskName: string;
-  deskType: DeskType;
-  membershipTier: MembershipTier | null;
-  date: string;
-  startTime: string;
-  endTime: string;
-  hours: number;
-  totalCost: number;
-  createdAt: string;
-}
-
-export interface BookingFormData {
-  date: string;
-  startTime: string;
-  endTime: string;
-  membershipTier: MembershipTier;
+  side: DeskSide;
+  desc: string;
+  position: number;
 }
 
 export interface DeskAvailability extends Desk {
   isAvailable: boolean;
 }
 
-export interface AnalyticsData {
-  totalBookings: number;
-  totalRevenue: number;
-  averageHours: number;
-  popularDesk: string;
-  tierBreakdown: Record<string, number>;
-  dailyBookings: { date: string; count: number }[];
+export interface Booking {
+  id: string;
+  deskId: string;
+  deskName: string;
+  deskDesc: string;
+  date: string;
+  holderName: string;
+  holderPhone: string;
+  payMethod: PayMethod;
+  amount: number;
+  createdAt: string;
 }
 
-export interface ApiResponse<T> {
-  data?: T;
-  error?: string;
+export interface AdminOverview {
+  desks: DeskAvailability[];
+  todaysBookings: Booking[];
+  totalBookings: number;
+  totalRevenue: number;
 }

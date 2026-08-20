@@ -1,7 +1,9 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
-import type { Booking, DeskAvailability, MembershipTier, DeskType } from '../types';
+import type { Booking, DeskAvailability, PayMethod } from '../types';
 import { api } from '../utils/api';
 import { getTodayString } from '../utils/helpers';
+
+export const DAY_RATE_NGN = 4000;
 
 interface BookingContextType {
   desks: DeskAvailability[];
@@ -9,17 +11,16 @@ interface BookingContextType {
   selectedDesk: DeskAvailability | null;
   loading: boolean;
   selectDesk: (deskId: string) => void;
+  clearSelectedDesk: () => void;
   createBooking: (data: {
     date: string;
-    startTime: string;
-    endTime: string;
-    membershipTier: MembershipTier;
+    holderName: string;
+    holderPhone: string;
+    payMethod: PayMethod;
   }) => Promise<Booking | undefined>;
   cancelBooking: (bookingId: string) => Promise<void>;
-  calculateTotal: (hours: number, deskType: DeskType, membershipTier: MembershipTier) => number;
-  getPricing: (deskType: DeskType, membershipTier: MembershipTier) => number;
-  refreshDesks: (date?: string, startTime?: string, endTime?: string) => Promise<void>;
-  refreshBookings: () => Promise<void>;
+  refreshDesks: (date?: string) => Promise<void>;
+  refreshBookings: (phone?: string) => Promise<void>;
 }
 
 const BookingContext = createContext<BookingContextType | null>(null);
@@ -36,23 +37,18 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
   const [selectedDesk, setSelectedDesk] = useState<DeskAvailability | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const refreshDesks = useCallback(async (date?: string, startTime?: string, endTime?: string) => {
+  const refreshDesks = useCallback(async (date?: string) => {
     try {
-      let data: DeskAvailability[];
-      if (date && startTime && endTime) {
-        data = await api.getDeskAvailability(date, startTime, endTime);
-      } else {
-        data = await api.getDesks(date || getTodayString());
-      }
+      const data = await api.getDesks(date || getTodayString());
       setDesks(data);
     } catch (err) {
       console.error('Failed to fetch desks:', err);
     }
   }, []);
 
-  const refreshBookings = useCallback(async () => {
+  const refreshBookings = useCallback(async (phone?: string) => {
     try {
-      const data = await api.getBookings();
+      const data = await api.getBookings(phone);
       setBookings(data);
     } catch (err) {
       console.error('Failed to fetch bookings:', err);
@@ -62,43 +58,35 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const init = async () => {
       setLoading(true);
-      await Promise.all([refreshDesks(), refreshBookings()]);
+      await refreshDesks();
       setLoading(false);
     };
     init();
-  }, [refreshDesks, refreshBookings]);
+  }, [refreshDesks]);
 
   const selectDesk = (deskId: string) => {
     const desk = desks.find(d => d.id === deskId) || null;
     setSelectedDesk(desk);
   };
 
-  const getPricing = (deskType: DeskType, membershipTier: MembershipTier): number => {
-    if (deskType === 'team') return 25;
-    const pricing: Record<MembershipTier, number> = { basic: 10, premium: 15, executive: 20 };
-    return pricing[membershipTier];
-  };
-
-  const calculateTotal = (hours: number, deskType: DeskType, membershipTier: MembershipTier): number => {
-    return getPricing(deskType, membershipTier) * hours;
-  };
+  const clearSelectedDesk = () => setSelectedDesk(null);
 
   const createBooking = async (data: {
     date: string;
-    startTime: string;
-    endTime: string;
-    membershipTier: MembershipTier;
+    holderName: string;
+    holderPhone: string;
+    payMethod: PayMethod;
   }): Promise<Booking | undefined> => {
     if (!selectedDesk) return;
     try {
       const booking = await api.createBooking({
         deskId: selectedDesk.id,
         date: data.date,
-        startTime: data.startTime,
-        endTime: data.endTime,
-        membershipTier: data.membershipTier,
+        holderName: data.holderName,
+        holderPhone: data.holderPhone,
+        payMethod: data.payMethod,
       });
-      await Promise.all([refreshDesks(), refreshBookings()]);
+      await refreshDesks(data.date);
       setSelectedDesk(null);
       return booking;
     } catch (err) {
@@ -109,7 +97,9 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
   const cancelBooking = async (bookingId: string): Promise<void> => {
     try {
       await api.cancelBooking(bookingId);
-      await Promise.all([refreshDesks(), refreshBookings()]);
+      await refreshDesks();
+      // Callers that know the holder's phone should re-run refreshBookings(phone)
+      // themselves afterward; GET /bookings requires a phone and won't list everyone's.
     } catch (err) {
       console.error('Failed to cancel booking:', err);
     }
@@ -118,8 +108,8 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
   return (
     <BookingContext.Provider value={{
       desks, bookings, selectedDesk, loading,
-      selectDesk, createBooking, cancelBooking,
-      calculateTotal, getPricing, refreshDesks, refreshBookings,
+      selectDesk, clearSelectedDesk, createBooking, cancelBooking,
+      refreshDesks, refreshBookings,
     }}>
       {children}
     </BookingContext.Provider>
