@@ -9,7 +9,7 @@ export const CONTACT = {
   phoneDisplay: '+234 904 622 8902',
   phoneTel: '+2349046228902',
   whatsappUrl: 'https://wa.me/2349046228902',
-  email: 'hello@zoneinhub.com',
+  email: 'zoneinhub@gmail.com',
   // Same location as the Plus Code used on the Google Business Profile listing.
   plusCode: 'M735+M9 Lagos',
   mapEmbedUrl: `https://www.google.com/maps?q=${encodeURIComponent('M735+M9 Lagos')}&output=embed`,
