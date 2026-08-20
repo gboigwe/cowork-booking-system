@@ -4,6 +4,7 @@ import { formatNaira } from '../utils/helpers';
 import FaqAccordion from '../components/zonein/FaqAccordion';
 import { FloatingShapes } from '../components/zonein/FloatingShapes';
 import FadeIn from '../components/zonein/FadeIn';
+import SEO from '../components/zonein/SEO';
 
 const pricingFaqs = [
   { q: 'Is the day pass per calendar day or 24 hours?', a: 'Per calendar day, for the hours we are open: Monday to Saturday, 6am to 6pm.' },
@@ -14,6 +15,11 @@ const pricingFaqs = [
 function PricingPage() {
   return (
     <div className="relative overflow-hidden max-w-7xl mx-auto px-5 sm:px-8 py-12 sm:py-20">
+      <SEO
+        title="Pricing | ZoneIn Hub Day Pass Coworking, Lagos"
+        description="One simple day pass rate for coworking in Alagbado, Lagos. No subscriptions, no hidden fees. Book a desk online and pay as you come in."
+        path="/pricing"
+      />
       <FloatingShapes variant="cream" />
 
       <FadeIn className="relative">

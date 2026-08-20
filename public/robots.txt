@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /my-bookings
+Disallow: /admin
+
+Sitemap: https://zoneinhub.com/sitemap.xml

@@ -4,6 +4,7 @@ import DeskLayout from '../components/zonein/DeskLayout';
 import ImageSlot from '../components/zonein/ImageSlot';
 import { FloatingShapes } from '../components/zonein/FloatingShapes';
 import FadeIn from '../components/zonein/FadeIn';
+import SEO from '../components/zonein/SEO';
 
 const amenities = [
   { title: 'Power backup', desc: "Uninterrupted, so an outage outside doesn't reach your desk." },
@@ -19,6 +20,11 @@ function SpacePage() {
 
   return (
     <div>
+      <SEO
+        title="The Space | ZoneIn Hub Coworking, Alagbado Lagos"
+        description="Take a full look at the ZoneIn Hub coworking space in Alagbado, Lagos: ten desks, stable power backup, reliable internet, and a calm room to work in."
+        path="/space"
+      />
       <ImageSlot label="Drop a wide interior photo" className="w-full h-[clamp(240px,34vw,420px)]" rounded={false} />
 
       <div className="relative overflow-hidden max-w-7xl mx-auto px-5 sm:px-8 py-12 sm:py-20">

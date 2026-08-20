@@ -45,6 +45,8 @@ function AdminPage() {
 
   return (
     <div className="min-h-screen bg-zonein-cream-alt px-5 sm:px-8 py-8">
+      <title>Staff | ZoneIn Hub</title>
+      <meta name="robots" content="noindex, nofollow" />
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center gap-3 mb-6">
           <Logo />

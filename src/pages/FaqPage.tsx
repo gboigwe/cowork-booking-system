@@ -1,6 +1,7 @@
 import FaqAccordion from '../components/zonein/FaqAccordion';
 import { FloatingShapes } from '../components/zonein/FloatingShapes';
 import FadeIn from '../components/zonein/FadeIn';
+import SEO from '../components/zonein/SEO';
 
 const faqs = [
   { q: 'Do you have printing or photocopying?', a: 'No. ZoneIn Hub is a workspace, not a cyber café. Bring your laptop and everything you need on it.' },
@@ -12,6 +13,11 @@ const faqs = [
 function FaqPage() {
   return (
     <div className="relative overflow-hidden max-w-7xl mx-auto px-5 sm:px-8 py-12 sm:py-20">
+      <SEO
+        title="FAQ | ZoneIn Hub Coworking Space, Lagos"
+        description="Answers to common questions about booking a desk, walk-ins, opening hours, and what to expect at ZoneIn Hub coworking space in Alagbado, Lagos."
+        path="/faq"
+      />
       <FloatingShapes variant="cream" />
       <div className="relative max-w-2xl">
         <FadeIn>

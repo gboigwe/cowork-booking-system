@@ -13,4 +13,11 @@ export const CONTACT = {
   // Same location as the Plus Code used on the Google Business Profile listing.
   plusCode: 'M735+M9 Lagos',
   mapEmbedUrl: `https://www.google.com/maps?q=${encodeURIComponent('M735+M9 Lagos')}&output=embed`,
+  // Nearby landmarks, since street addressing alone is unreliable for this area.
+  landmarks: [
+    'Around Nightingale Academy',
+    'After Lizben Schools',
+    'Around Community School, Surulere',
+    'Off Amikanle, Alagbado, Lagos',
+  ],
 };

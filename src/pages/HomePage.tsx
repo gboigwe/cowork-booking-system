@@ -4,6 +4,7 @@ import { useRef, useEffect } from 'react';
 import ImageSlot from '../components/zonein/ImageSlot';
 import { FloatingShape, FloatingShapes } from '../components/zonein/FloatingShapes';
 import FadeIn from '../components/zonein/FadeIn';
+import SEO from '../components/zonein/SEO';
 import { CONTACT } from '../utils/contact';
 import { DAY_RATE_NGN } from '../context/BookingContext';
 import { formatNaira } from '../utils/helpers';
@@ -146,6 +147,11 @@ export default function HomePage() {
 
   return (
     <div ref={containerRef} className="overflow-x-hidden">
+      <SEO
+        title="ZoneIn Hub | Coworking Day Pass Space in Alagbado, Lagos"
+        description="Book a coworking day pass in Alagbado, Lagos. Stable power, reliable internet, and a calm, focused room to work in. Ten desks, walk-ins welcome, Monday to Saturday."
+        path="/"
+      />
 
       {/* ━━━ HERO ━━━ */}
       <section ref={heroRef} className="relative w-full overflow-hidden bg-zonein-cream">

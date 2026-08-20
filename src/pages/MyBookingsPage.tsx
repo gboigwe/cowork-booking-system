@@ -79,6 +79,8 @@ function MyBookingsPage() {
 
   return (
     <div className="relative overflow-hidden max-w-7xl mx-auto px-5 sm:px-8 py-10 sm:py-16">
+      <title>My Bookings | ZoneIn Hub</title>
+      <meta name="robots" content="noindex, nofollow" />
       <FloatingShapes variant="cream" />
       <div className="relative max-w-lg">
       <h1 className="font-display font-bold text-3xl sm:text-[34px] text-zonein-ink mb-8">My bookings</h1>

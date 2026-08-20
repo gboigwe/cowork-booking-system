@@ -1,9 +1,15 @@
 import { FloatingShapes } from '../components/zonein/FloatingShapes';
 import FadeIn from '../components/zonein/FadeIn';
+import SEO from '../components/zonein/SEO';
 
 function TermsPage() {
   return (
     <div className="relative overflow-hidden max-w-7xl mx-auto px-5 sm:px-8 py-12 sm:py-20">
+      <SEO
+        title="Terms of Use | ZoneIn Hub"
+        description="Terms of use for booking a coworking day pass desk at ZoneIn Hub in Alagbado, Lagos."
+        path="/terms"
+      />
       <FloatingShapes variant="cream" />
       <div className="relative max-w-2xl">
         <FadeIn>

@@ -1,10 +1,16 @@
 import { CONTACT } from '../utils/contact';
 import { FloatingShapes } from '../components/zonein/FloatingShapes';
 import FadeIn from '../components/zonein/FadeIn';
+import SEO from '../components/zonein/SEO';
 
 function AboutPage() {
   return (
     <div className="relative overflow-hidden max-w-7xl mx-auto px-5 sm:px-8 py-12 sm:py-20">
+      <SEO
+        title="About | ZoneIn Hub Coworking Space, Alagbado Lagos"
+        description="ZoneIn Hub is a coworking day pass space in Alagbado, Lagos, built for tech professionals, freelancers, and remote workers who need a quiet place to work."
+        path="/about"
+      />
       <FloatingShapes variant="cream" />
       <div className="relative max-w-3xl">
 

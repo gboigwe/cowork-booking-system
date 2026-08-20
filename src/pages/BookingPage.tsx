@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import DeskLayout from '../components/zonein/DeskLayout';
 import { FloatingShapes } from '../components/zonein/FloatingShapes';
+import SEO from '../components/zonein/SEO';
 import { useBooking, DAY_RATE_NGN } from '../context/BookingContext';
 import { api } from '../utils/api';
 import { formatNaira, getTodayString } from '../utils/helpers';
@@ -76,6 +77,11 @@ function BookingPage() {
 
   return (
     <div className="relative overflow-hidden max-w-7xl mx-auto px-5 sm:px-8 py-10 sm:py-16">
+      <SEO
+        title="Book a Seat | ZoneIn Hub Coworking Space, Lagos"
+        description="Pick a desk, choose a date, and book your coworking day pass at ZoneIn Hub in Alagbado, Lagos in minutes. No account needed, walk-ins welcome."
+        path="/booking"
+      />
       <FloatingShapes variant="cream" />
       <h1 className="relative font-display font-bold text-3xl sm:text-4xl text-zonein-ink mb-2">Book a seat</h1>
       <p className="relative text-[15px] text-zonein-gray mb-10">Pick a desk, choose a date, and you're set.</p>
