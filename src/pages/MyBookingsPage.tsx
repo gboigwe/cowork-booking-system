@@ -25,6 +25,11 @@ function BookingRow({ booking, faded }: { booking: Booking; faded?: boolean }) {
         <p className="text-[13px] text-zonein-gray mt-0.5 capitalize">{booking.deskDesc}</p>
       </div>
       <div className="flex items-center gap-3">
+        <span className={`text-[11px] font-semibold uppercase tracking-[0.04em] px-2 py-1 rounded-md ${
+          booking.status === 'confirmed' ? 'bg-zonein-green/15 text-zonein-green-dark' : 'bg-zonein-border text-zonein-gray'
+        }`}>
+          {booking.status === 'confirmed' ? 'Confirmed' : 'Pending'}
+        </span>
         <span className="text-[13px] text-zonein-gray">{formatDayDate(booking.date)}</span>
         <button
           onClick={handleTicket}

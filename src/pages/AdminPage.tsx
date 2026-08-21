@@ -43,6 +43,12 @@ function AdminPage() {
     loadOverview(token);
   };
 
+  const handleConfirmBooking = async (bookingId: string) => {
+    if (!token) return;
+    await api.adminConfirmBooking(bookingId, token);
+    loadOverview(token);
+  };
+
   return (
     <div className="min-h-screen bg-zonein-cream-alt px-5 sm:px-8 py-8">
       <title>Staff | ZoneIn Hub</title>
@@ -106,9 +112,23 @@ function AdminPage() {
                 <p className="px-5 py-6 text-sm text-zonein-gray">No bookings today.</p>
               ) : (
                 overview.todaysBookings.map(b => (
-                  <div key={b.id} className="px-5 py-3.5 border-b border-zonein-border last:border-b-0 flex justify-between">
-                    <span className="text-sm font-semibold text-zonein-ink">{b.deskName}</span>
-                    <span className="text-sm text-zonein-gray">{b.holderName} · {b.holderPhone}</span>
+                  <div key={b.id} className="px-5 py-3.5 border-b border-zonein-border last:border-b-0 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="text-sm font-semibold text-zonein-ink shrink-0">{b.deskName}</span>
+                      <span className="text-sm text-zonein-gray truncate">{b.holderName} · {b.holderPhone}</span>
+                    </div>
+                    {b.status === 'confirmed' ? (
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.04em] px-2.5 py-1 rounded-md bg-zonein-green/15 text-zonein-green-dark shrink-0">
+                        Confirmed
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => handleConfirmBooking(b.id)}
+                        className="text-[13px] font-display font-semibold text-zonein-cream bg-zonein-green hover:bg-zonein-green-dark rounded-lg px-3.5 py-1.5 shrink-0 transition-colors"
+                      >
+                        Confirm
+                      </button>
+                    )}
                   </div>
                 ))
               )}

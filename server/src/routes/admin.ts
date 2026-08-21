@@ -54,7 +54,7 @@ router.get('/overview', requireAdmin, (_req: Request, res: Response) => {
   const todaysRows = db.prepare('SELECT * FROM bookings WHERE date = ? ORDER BY created_at DESC').all(date) as any[];
   const todaysBookings: Booking[] = todaysRows.map(r => ({
     id: r.id, deskId: r.desk_id, deskName: r.desk_name, deskDesc: r.desk_desc, date: r.date,
-    holderName: r.holder_name, holderPhone: r.holder_phone, payMethod: r.pay_method,
+    holderName: r.holder_name, holderPhone: r.holder_phone, status: r.status,
     amount: r.amount, createdAt: r.created_at,
   }));
 
@@ -68,6 +68,16 @@ router.get('/overview', requireAdmin, (_req: Request, res: Response) => {
   };
 
   res.json(overview);
+});
+
+router.patch('/bookings/:id/confirm', requireAdmin, (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = db.prepare("UPDATE bookings SET status = 'confirmed' WHERE id = ? AND status = 'pending'").run(id);
+  if (result.changes === 0) {
+    res.status(404).json({ error: 'Pending booking not found' });
+    return;
+  }
+  res.json({ success: true });
 });
 
 router.patch('/desks/:id/block', requireAdmin, (req: Request, res: Response) => {

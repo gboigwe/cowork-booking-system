@@ -1,5 +1,5 @@
 export type DeskSide = 'left' | 'right';
-export type PayMethod = 'online' | 'venue';
+export type BookingStatus = 'pending' | 'confirmed';
 
 export interface Desk {
   id: string;
@@ -20,7 +20,7 @@ export interface Booking {
   date: string;
   holderName: string;
   holderPhone: string;
-  payMethod: PayMethod;
+  status: BookingStatus;
   amount: number;
   createdAt: string;
 }

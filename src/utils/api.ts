@@ -1,4 +1,4 @@
-import type { Booking, DeskAvailability, PayMethod, AdminOverview } from '../types';
+import type { Booking, DeskAvailability, AdminOverview } from '../types';
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
@@ -26,7 +26,6 @@ export const api = {
     date: string;
     holderName: string;
     holderPhone: string;
-    payMethod: PayMethod;
   }) =>
     request<Booking>('/bookings', {
       method: 'POST',
@@ -61,6 +60,12 @@ export const api = {
 
   adminToggleBlock: (deskId: string, token: string) =>
     request<{ success: boolean }>(`/admin/desks/${deskId}/block`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    }),
+
+  adminConfirmBooking: (bookingId: string, token: string) =>
+    request<{ success: boolean }>(`/admin/bookings/${bookingId}/confirm`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     }),

@@ -35,7 +35,7 @@ db.exec(`
     date TEXT NOT NULL,
     holder_name TEXT NOT NULL,
     holder_phone TEXT NOT NULL,
-    pay_method TEXT NOT NULL CHECK(pay_method IN ('online', 'venue')),
+    status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'confirmed')),
     amount REAL NOT NULL,
     created_at TEXT NOT NULL,
     FOREIGN KEY (desk_id) REFERENCES desks(id)

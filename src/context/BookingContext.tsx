@@ -1,9 +1,12 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
-import type { Booking, DeskAvailability, PayMethod } from '../types';
+import type { Booking, DeskAvailability } from '../types';
 import { api } from '../utils/api';
 import { getTodayString } from '../utils/helpers';
 
-export const DAY_RATE_NGN = 4000;
+// Standard price is ₦4,000; temporarily testing ₦2,500. Switch back by
+// swapping which line is active.
+// export const DAY_RATE_NGN = 4000;
+export const DAY_RATE_NGN = 2500;
 
 interface BookingContextType {
   desks: DeskAvailability[];
@@ -16,7 +19,6 @@ interface BookingContextType {
     date: string;
     holderName: string;
     holderPhone: string;
-    payMethod: PayMethod;
   }) => Promise<Booking | undefined>;
   cancelBooking: (bookingId: string) => Promise<void>;
   refreshDesks: (date?: string) => Promise<void>;
@@ -75,7 +77,6 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
     date: string;
     holderName: string;
     holderPhone: string;
-    payMethod: PayMethod;
   }): Promise<Booking | undefined> => {
     if (!selectedDesk) return;
     try {
@@ -84,7 +85,6 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
         date: data.date,
         holderName: data.holderName,
         holderPhone: data.holderPhone,
-        payMethod: data.payMethod,
       });
       await refreshDesks(data.date);
       setSelectedDesk(null);

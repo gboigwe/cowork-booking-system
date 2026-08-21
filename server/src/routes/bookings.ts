@@ -1,9 +1,13 @@
 import { Router, type Request, type Response } from 'express';
 import db from '../db/database.js';
-import type { Booking, PayMethod } from '../types/index.js';
+import type { Booking } from '../types/index.js';
 import crypto from 'crypto';
 
-export const DAY_RATE_NGN = 4000;
+// Standard price is ₦4,000; temporarily testing ₦2,500. Switch back by
+// swapping which line is active. Keep this in sync with
+// src/context/BookingContext.tsx on the frontend.
+// export const DAY_RATE_NGN = 4000;
+export const DAY_RATE_NGN = 2500;
 
 const router = Router();
 
@@ -16,7 +20,7 @@ function rowToBooking(r: any): Booking {
     date: r.date,
     holderName: r.holder_name,
     holderPhone: r.holder_phone,
-    payMethod: r.pay_method,
+    status: r.status,
     amount: r.amount,
     createdAt: r.created_at,
   };
@@ -40,17 +44,16 @@ router.get('/', (req: Request, res: Response) => {
 });
 
 // POST /api/bookings
+// No payment is taken here. The booking is created as 'pending' and the
+// desk pass is reserved immediately; staff confirm it (via /api/admin) once
+// the holder pays in person at the venue.
 router.post('/', (req: Request, res: Response) => {
-  const { deskId, date, holderName, holderPhone, payMethod } = req.body as {
-    deskId?: string; date?: string; holderName?: string; holderPhone?: string; payMethod?: PayMethod;
+  const { deskId, date, holderName, holderPhone } = req.body as {
+    deskId?: string; date?: string; holderName?: string; holderPhone?: string;
   };
 
-  if (!deskId || !date || !holderName || !holderPhone || !payMethod) {
-    res.status(400).json({ error: 'deskId, date, holderName, holderPhone, payMethod are required' });
-    return;
-  }
-  if (payMethod !== 'online' && payMethod !== 'venue') {
-    res.status(400).json({ error: 'payMethod must be "online" or "venue"' });
+  if (!deskId || !date || !holderName || !holderPhone) {
+    res.status(400).json({ error: 'deskId, date, holderName, holderPhone are required' });
     return;
   }
 
@@ -74,13 +77,13 @@ router.post('/', (req: Request, res: Response) => {
   const createdAt = new Date().toISOString();
 
   db.prepare(`
-    INSERT INTO bookings (id, desk_id, desk_name, desk_desc, date, holder_name, holder_phone, pay_method, amount, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(id, deskId, desk.id, desk.desc, date, holderName, holderPhone, payMethod, DAY_RATE_NGN, createdAt);
+    INSERT INTO bookings (id, desk_id, desk_name, desk_desc, date, holder_name, holder_phone, status, amount, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)
+  `).run(id, deskId, desk.id, desk.desc, date, holderName, holderPhone, DAY_RATE_NGN, createdAt);
 
   const booking: Booking = {
     id, deskId, deskName: desk.id, deskDesc: desk.desc, date,
-    holderName, holderPhone, payMethod, amount: DAY_RATE_NGN, createdAt,
+    holderName, holderPhone, status: 'pending', amount: DAY_RATE_NGN, createdAt,
   };
 
   res.status(201).json(booking);

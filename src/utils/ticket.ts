@@ -102,16 +102,16 @@ export async function generateTicketPDF(booking: Booking) {
   doc.text(booking.holderPhone, col2, y);
   y += 16;
 
-  // Payment
+  // Status
   doc.setFontSize(6);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(GRAY);
-  doc.text('PAYMENT', col1, y);
+  doc.text('STATUS', col1, y);
   y += 10;
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(DARK);
-  doc.text(booking.payMethod === 'online' ? 'Paid online' : 'Pay at the venue', col1, y);
+  doc.setTextColor(booking.status === 'confirmed' ? GREEN : DARK);
+  doc.text(booking.status === 'confirmed' ? 'Confirmed' : 'Pending, pay at the venue', col1, y);
   y += 16;
 
   // Dashed separator
