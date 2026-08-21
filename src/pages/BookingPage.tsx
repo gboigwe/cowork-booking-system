@@ -72,11 +72,7 @@ function BookingPage() {
 
   return (
     <div className="relative overflow-hidden max-w-7xl mx-auto px-5 sm:px-8 py-10 sm:py-16">
-      <SEO
-        title="Book a Seat | ZoneIn Hub Coworking Space, Lagos"
-        description="Pick a desk, choose a date, and book your coworking day pass at ZoneIn Hub in Alagbado, Lagos in minutes. No payment online, pay when you arrive."
-        path="/booking"
-      />
+      <SEO path="/booking" />
       <FloatingShapes variant="cream" />
       <h1 className="relative font-display font-bold text-3xl sm:text-4xl text-zonein-ink mb-2">Book a seat</h1>
       <p className="relative text-[15px] text-zonein-gray mb-10">Pick a desk, choose a date, and pay when you arrive.</p>

@@ -9,8 +9,12 @@ import { seedDesks } from './db/seed.js';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// CORS_ORIGIN accepts one origin or a comma-separated list, e.g.
+// "https://zoneinhub.com,https://www.zoneinhub.com,https://techage.vercel.app"
+const allowedOrigins = process.env.CORS_ORIGIN?.split(',').map(o => o.trim()).filter(Boolean);
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
+  origin: allowedOrigins && allowedOrigins.length > 0 ? allowedOrigins : '*',
 }));
 app.use(express.json());
 

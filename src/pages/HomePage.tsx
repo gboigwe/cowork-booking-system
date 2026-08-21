@@ -147,11 +147,7 @@ export default function HomePage() {
 
   return (
     <div ref={containerRef} className="overflow-x-hidden">
-      <SEO
-        title="ZoneIn Hub | Coworking Day Pass Space in Alagbado, Lagos"
-        description="Book a coworking day pass in Alagbado, Lagos. Stable power, reliable internet, and a calm, focused room to work in. Ten desks, walk-ins welcome, Monday to Saturday."
-        path="/"
-      />
+      <SEO path="/" />
 
       {/* ━━━ HERO ━━━ */}
       <section ref={heroRef} className="relative w-full overflow-hidden bg-zonein-cream">

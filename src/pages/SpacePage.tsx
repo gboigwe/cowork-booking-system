@@ -20,11 +20,7 @@ function SpacePage() {
 
   return (
     <div>
-      <SEO
-        title="The Space | ZoneIn Hub Coworking, Alagbado Lagos"
-        description="Take a full look at the ZoneIn Hub coworking space in Alagbado, Lagos: ten desks, stable power backup, reliable internet, and a calm room to work in."
-        path="/space"
-      />
+      <SEO path="/space" />
       <ImageSlot
         src="/images/room-corner.jpg"
         alt="Inside the ZoneIn Hub coworking room, Alagbado, Lagos"

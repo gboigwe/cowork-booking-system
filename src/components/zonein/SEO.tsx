@@ -1,8 +1,18 @@
 // React 19 hoists <title>/<meta>/<link> rendered anywhere in the tree up to
-// <head> automatically, updating on route change, no extra library needed.
+// <head> automatically in the browser, updating on route change, no extra
+// library needed. That hoisting doesn't happen under plain renderToString on
+// the server though (these would render as literal elements inside <body>,
+// duplicating what scripts/prerender.mjs already writes into <head> via
+// string replacement), so this renders nothing during SSR.
+import { SEO_MANIFEST } from '../../seo-manifest';
+
 const SITE_URL = 'https://zoneinhub.com';
 
-function SEO({ title, description, path = '/' }: { title: string; description: string; path?: string }) {
+function SEO({ path }: { path: string }) {
+  if (typeof window === 'undefined') return null;
+  const entry = SEO_MANIFEST[path];
+  if (!entry) return null;
+  const { title, description } = entry;
   const url = `${SITE_URL}${path}`;
   return (
     <>

@@ -6,11 +6,7 @@ import SEO from '../components/zonein/SEO';
 function LocationPage() {
   return (
     <div className="relative overflow-hidden max-w-7xl mx-auto px-5 sm:px-8 py-12 sm:py-20">
-      <SEO
-        title="Location & Contact | ZoneIn Hub, Alagbado Lagos"
-        description="Find ZoneIn Hub in Alagbado, Lagos: around Nightingale Academy, after Lizben Schools, off Amikanle. Address, hours, phone, WhatsApp, and email."
-        path="/location"
-      />
+      <SEO path="/location" />
       <FloatingShapes variant="cream" />
 
       <FadeIn className="relative">

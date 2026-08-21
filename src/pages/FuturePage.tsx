@@ -14,11 +14,7 @@ function FuturePage() {
 
   return (
     <div className="relative overflow-hidden max-w-7xl mx-auto px-5 sm:px-8 py-14 sm:py-24 text-center">
-      <SEO
-        title="Private Offices & Meeting Room | ZoneIn Hub, Lagos"
-        description="Private offices and a meeting room are coming soon to ZoneIn Hub in Alagbado, Lagos. Leave your email to be the first to know."
-        path="/future"
-      />
+      <SEO path="/future" />
       <FloatingShapes variant="cream" />
       <FadeIn className="relative max-w-xl mx-auto">
         <p className="text-[13px] font-semibold uppercase tracking-[0.06em] text-zonein-green-dark mb-4">Coming soon</p>
