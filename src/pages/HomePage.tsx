@@ -270,9 +270,9 @@ export default function HomePage() {
             </div>
           </FadeIn>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            <FadeIn delay={0}><ImageSlot label="Interior photo" className="h-[220px]" /></FadeIn>
-            <FadeIn delay={0.1}><ImageSlot label="Seating photo" className="h-[220px]" /></FadeIn>
-            <FadeIn delay={0.2}><ImageSlot label="Interior photo" className="h-[220px]" /></FadeIn>
+            <FadeIn delay={0}><ImageSlot src="/images/desks-2.jpg" alt="Desks along the wall at ZoneIn Hub" className="w-full h-[220px]" /></FadeIn>
+            <FadeIn delay={0.1}><ImageSlot src="/images/laptop-desk.jpg" alt="A desk set up with a laptop at ZoneIn Hub" className="w-full h-[220px]" /></FadeIn>
+            <FadeIn delay={0.2}><ImageSlot src="/images/desks-cabinet.jpg" alt="Desks at ZoneIn Hub" className="w-full h-[220px]" /></FadeIn>
           </div>
         </div>
       </section>

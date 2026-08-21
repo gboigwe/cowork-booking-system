@@ -25,7 +25,12 @@ function SpacePage() {
         description="Take a full look at the ZoneIn Hub coworking space in Alagbado, Lagos: ten desks, stable power backup, reliable internet, and a calm room to work in."
         path="/space"
       />
-      <ImageSlot label="Drop a wide interior photo" className="w-full h-[clamp(240px,34vw,420px)]" rounded={false} />
+      <ImageSlot
+        src="/images/room-corner.jpg"
+        alt="Inside the ZoneIn Hub coworking room, Alagbado, Lagos"
+        className="w-full h-[clamp(240px,34vw,420px)]"
+        rounded={false}
+      />
 
       <div className="relative overflow-hidden max-w-7xl mx-auto px-5 sm:px-8 py-12 sm:py-20">
         <FloatingShapes variant="cream" />
@@ -48,8 +53,15 @@ function SpacePage() {
 
         <FadeIn><h2 className="relative font-display font-semibold text-[22px] text-zonein-ink mb-6">Around the room</h2></FadeIn>
         <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-18">
-          {['Photo', 'Photo', 'Photo', 'Photo'].map((label, i) => (
-            <FadeIn key={i} delay={i * 0.08}><ImageSlot label={label} className="h-[200px]" /></FadeIn>
+          {[
+            { src: '/images/desks-1.jpg', alt: 'Desks with dividers at ZoneIn Hub' },
+            { src: '/images/desks-2.jpg', alt: 'Desks along the wall at ZoneIn Hub' },
+            { src: '/images/laptop-desk.jpg', alt: 'A desk set up with a laptop at ZoneIn Hub' },
+            { src: '/images/desks-3.jpg', alt: 'Desks and seating at ZoneIn Hub' },
+          ].map((photo, i) => (
+            <FadeIn key={photo.src} delay={i * 0.08}>
+              <ImageSlot src={photo.src} alt={photo.alt} className="w-full h-[200px]" />
+            </FadeIn>
           ))}
         </div>
 
