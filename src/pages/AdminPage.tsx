@@ -6,8 +6,16 @@ import type { AdminOverview, InterestSignup } from '../types';
 
 const TOKEN_KEY = 'zonein_admin_token';
 
+// Neutralize CSV formula injection: a cell starting with = + - @ or a tab/CR
+// can execute as a formula when the file is opened in Excel/Sheets, and this
+// data comes straight from the public /interest form.
+function csvCell(value: string): string {
+  const safe = /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
+  return `"${safe.replace(/"/g, '""')}"`;
+}
+
 function downloadCsv(filename: string, rows: string[][]) {
-  const csv = rows.map(row => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(',')).join('\n');
+  const csv = rows.map(row => row.map(csvCell).join(',')).join('\n');
   const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
