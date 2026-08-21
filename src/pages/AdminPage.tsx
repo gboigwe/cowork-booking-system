@@ -1,16 +1,30 @@
 import { useEffect, useState } from 'react';
 import { api } from '../utils/api';
-import { formatNaira } from '../utils/helpers';
+import { formatNaira, formatDate } from '../utils/helpers';
 import Logo from '../components/Logo';
-import type { AdminOverview } from '../types';
+import type { AdminOverview, InterestSignup } from '../types';
 
 const TOKEN_KEY = 'zonein_admin_token';
+
+function downloadCsv(filename: string, rows: string[][]) {
+  const csv = rows.map(row => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
 
 function AdminPage() {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem(TOKEN_KEY));
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState(false);
   const [overview, setOverview] = useState<AdminOverview | null>(null);
+  const [interest, setInterest] = useState<InterestSignup[] | null>(null);
 
   const loadOverview = async (t: string) => {
     try {
@@ -22,9 +36,29 @@ function AdminPage() {
     }
   };
 
+  const loadInterest = async (t: string) => {
+    try {
+      const data = await api.adminInterestSignups(t);
+      setInterest(data);
+    } catch {
+      // overview's own failure already handles logging out on an invalid token
+    }
+  };
+
   useEffect(() => {
-    if (token) loadOverview(token);
+    if (token) {
+      loadOverview(token);
+      loadInterest(token);
+    }
   }, [token]);
+
+  const handleExportInterest = () => {
+    if (!interest || interest.length === 0) return;
+    downloadCsv(
+      `zonein-interest-${new Date().toISOString().slice(0, 10)}.csv`,
+      [['Name', 'Email', 'Signed up'], ...interest.map(s => [s.name, s.email, formatDate(s.createdAt)])],
+    );
+  };
 
   const handleLogin = async () => {
     setLoginError(false);
@@ -129,6 +163,34 @@ function AdminPage() {
                         Confirm
                       </button>
                     )}
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="flex items-center justify-between mb-4 mt-8">
+              <p className="font-display font-semibold text-base text-zonein-ink">
+                Interest signups ({interest?.length ?? 0})
+              </p>
+              <button
+                onClick={handleExportInterest}
+                disabled={!interest || interest.length === 0}
+                className="text-[13px] font-display font-semibold text-zonein-green-dark border border-zonein-green rounded-lg px-3.5 py-1.5 hover:bg-zonein-green/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Download CSV
+              </button>
+            </div>
+            <div className="bg-zonein-cream border border-zonein-border rounded-xl overflow-y-auto max-h-80">
+              {!interest || interest.length === 0 ? (
+                <p className="px-5 py-6 text-sm text-zonein-gray">No signups yet.</p>
+              ) : (
+                interest.map(s => (
+                  <div key={s.id} className="px-5 py-3.5 border-b border-zonein-border last:border-b-0 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="text-sm font-semibold text-zonein-ink shrink-0">{s.name}</span>
+                      <span className="text-sm text-zonein-gray truncate">{s.email}</span>
+                    </div>
+                    <span className="text-xs text-zonein-gray shrink-0">{formatDate(s.createdAt)}</span>
                   </div>
                 ))
               )}

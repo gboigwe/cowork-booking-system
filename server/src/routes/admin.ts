@@ -1,7 +1,7 @@
 import { Router, type Request, type Response, type NextFunction } from 'express';
 import crypto from 'crypto';
 import db from '../db/database.js';
-import type { AdminOverview, Booking, DeskAvailability } from '../types/index.js';
+import type { AdminOverview, Booking, DeskAvailability, InterestSignup } from '../types/index.js';
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || (process.env.NODE_ENV !== 'production' ? 'zonein2026' : undefined);
 if (!ADMIN_PASSWORD) {
@@ -103,6 +103,14 @@ router.patch('/desks/:id/block', requireAdmin, (req: Request, res: Response) => 
   }
 
   res.json({ success: true });
+});
+
+router.get('/interest', requireAdmin, (_req: Request, res: Response) => {
+  const rows = db.prepare('SELECT * FROM interest_signups ORDER BY created_at DESC').all() as any[];
+  const signups: InterestSignup[] = rows.map(r => ({
+    id: r.id, name: r.name, email: r.email, createdAt: r.created_at,
+  }));
+  res.json(signups);
 });
 
 export default router;

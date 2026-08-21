@@ -31,3 +31,10 @@ export interface AdminOverview {
   totalBookings: number;
   totalRevenue: number;
 }
+
+export interface InterestSignup {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: string;
+}

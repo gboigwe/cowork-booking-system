@@ -1,4 +1,4 @@
-import type { Booking, DeskAvailability, AdminOverview } from '../types';
+import type { Booking, DeskAvailability, AdminOverview, InterestSignup } from '../types';
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
@@ -67,6 +67,17 @@ export const api = {
   adminConfirmBooking: (bookingId: string, token: string) =>
     request<{ success: boolean }>(`/admin/bookings/${bookingId}/confirm`, {
       method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    }),
+
+  submitInterest: (name: string, email: string) =>
+    request<InterestSignup>('/interest', {
+      method: 'POST',
+      body: JSON.stringify({ name, email }),
+    }),
+
+  adminInterestSignups: (token: string) =>
+    request<InterestSignup[]>('/admin/interest', {
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     }),
 };

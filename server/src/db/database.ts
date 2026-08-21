@@ -40,6 +40,13 @@ db.exec(`
     created_at TEXT NOT NULL,
     FOREIGN KEY (desk_id) REFERENCES desks(id)
   );
+
+  CREATE TABLE IF NOT EXISTS interest_signups (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    created_at TEXT NOT NULL
+  );
 `);
 
 export default db;

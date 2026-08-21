@@ -10,6 +10,7 @@ import AboutPage from './pages/AboutPage';
 import LocationPage from './pages/LocationPage';
 import FaqPage from './pages/FaqPage';
 import FuturePage from './pages/FuturePage';
+import InterestPage from './pages/InterestPage';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import AdminPage from './pages/AdminPage';
@@ -38,6 +39,7 @@ function App() {
         <Route path="/location" element={<CustomerLayout><LocationPage /></CustomerLayout>} />
         <Route path="/faq" element={<CustomerLayout><FaqPage /></CustomerLayout>} />
         <Route path="/future" element={<CustomerLayout><FuturePage /></CustomerLayout>} />
+        <Route path="/interest" element={<CustomerLayout><InterestPage /></CustomerLayout>} />
         <Route path="/privacy" element={<CustomerLayout><PrivacyPage /></CustomerLayout>} />
         <Route path="/terms" element={<CustomerLayout><TermsPage /></CustomerLayout>} />
         <Route path="/admin" element={<AdminPage />} />
